@@ -235,7 +235,6 @@
                     <label class="option-item"><input type="radio" name="proteina" value="Carne de porco frito"> <span>Carne de porco frito</span></label>
                     <label class="option-item"><input type="radio" name="proteina" value="Peito de frango empanado"> <span>Peito de frango empanado</span></label>
                     <label class="option-item"><input type="radio" name="proteina" value="Feijoada"> <span>Feijoada</span></label>
-                    <label class="option-item"><input type="radio" name="proteina" value="Uma opção de carne"> <span>Uma opção de carne</span></label>
                 </div>
             </div>
 
@@ -248,14 +247,12 @@
                 </div>
             </div>
 
-            <!-- Feijões e Legumes -->
+            <!-- Feijões -->
             <div class="card cat-feijao">
-                <h2>🍲 Feijões e Legumes</h2>
+                <h2>🍲 Feijões (Escolha 1)</h2>
                 <div class="option-group">
-                    <label class="option-item"><input type="checkbox" name="feijao" value="Feijão tropeiro"> <span>Feijão tropeiro</span></label>
-                    <label class="option-item"><input type="checkbox" name="feijao" value="Feijão caldo"> <span>Feijão caldo</span></label>
-                    <label class="option-item"><input type="checkbox" name="feijao" value="Legumes cozido"> <span>Legumes cozido</span></label>
-                    <label class="option-item"><input type="checkbox" name="feijao" value="Beterraba"> <span>Beterraba</span></label>
+                    <label class="option-item"><input type="radio" name="feijao" value="Feijão tropeiro"> <span>Feijão tropeiro</span></label>
+                    <label class="option-item"><input type="radio" name="feijao" value="Feijão caldo"> <span>Feijão caldo</span></label>
                 </div>
             </div>
 
@@ -265,6 +262,8 @@
                 <div class="option-group">
                     <label class="option-item"><input type="checkbox" name="salada" value="Alface com tomate"> <span>Alface com tomate</span></label>
                     <label class="option-item"><input type="checkbox" name="salada" value="Maionese"> <span>Maionese</span></label>
+                    <label class="option-item"><input type="checkbox" name="salada" value="Legumes cozido"> <span>Legumes cozido</span></label>
+                    <label class="option-item"><input type="checkbox" name="salada" value="Beterraba"> <span>Beterraba</span></label>
                 </div>
             </div>
 
@@ -285,7 +284,7 @@
 
     <script>
         // Configuração do Restaurante
-        const RESTAURANT_PHONE = "5511999999999"; // Substitua pelo número real (DDI + DDD + Número)
+        const RESTAURANT_PHONE = "5573991199188"; 
 
         const form = document.getElementById('lunch-form');
         const btnGenerate = document.getElementById('btn-generate');
@@ -309,6 +308,7 @@
         btnGenerate.addEventListener('click', () => {
             const name = document.getElementById('user-name').value.trim();
             const proteina = document.querySelector('input[name="proteina"]:checked');
+            const feijao = document.querySelector('input[name="feijao"]:checked');
             
             // Validações
             if (!name) {
@@ -322,7 +322,6 @@
             }
 
             const acomp = getSelectedValues('acomp');
-            const feijao = getSelectedValues('feijao');
             const salada = getSelectedValues('salada');
 
             // Formatação do Resumo
@@ -331,7 +330,7 @@
             summary += `🥩 *Proteína:* ${proteina.value}\n`;
             
             if (acomp.length > 0) summary += `🍝 *Acomp:* ${acomp.join(', ')}\n`;
-            if (feijao.length > 0) summary += `🍲 *Feijão/Legumes:* ${feijao.join(', ')}\n`;
+            if (feijao) summary += `🍲 *Feijão:* ${feijao.value}\n`;
             if (salada.length > 0) summary += `🥗 *Salada/Frios:* ${salada.join(', ')}`;
 
             // Exibir Resumo
@@ -351,7 +350,7 @@
             // Configurar link WhatsApp
             const encodedText = encodeURIComponent(summary);
             btnWhatsapp.onclick = () => {
-                window.open(`https://api.whatsapp.com/send?phone=${RESTAURANT_PHONE}&text=${encodedText}`, '_blank');
+                window.open(`https://wa.me/${RESTAURANT_PHONE}?text=${encodedText}`, '_blank');
             };
         });
     </script>
