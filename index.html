@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido de Almoço Corporativo</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #22c55e;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 20px 15px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .card h2 {
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid var(--bg);
+            padding-bottom: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label.input-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .option-item:hover {
+            background: #f1f5f9;
+        }
+
+        .option-item input {
+            width: 18px;
+            height: 18px;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+
+        .option-item span {
+            font-size: 1rem;
+        }
+
+        .actions {
+            margin-top: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-whatsapp {
+            background-color: #25d366;
+            color: white;
+            display: none; /* Hidden until order is generated */
+        }
+
+        .btn-whatsapp:hover {
+            background-color: #128c7e;
+        }
+
+        #summary-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            display: none;
+            border-left: 4px solid var(--primary);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #334155;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: none;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        /* Cores por categoria para facilitar leitura */
+        .cat-proteina h2 { color: #e11d48; }
+        .cat-acomp h2 { color: #d97706; }
+        .cat-feijao h2 { color: #7c3aed; }
+        .cat-salada h2 { color: #059669; }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>🍱 Pedido de Almoço</h1>
+            <p>Preencha suas escolhas para hoje</p>
+        </header>
+
+        <form id="lunch-form">
+            <!-- Identificação -->
+            <div class="card">
+                <div class="form-group">
+                    <label class="input-label" for="user-name">Seu Nome *</label>
+                    <input type="text" id="user-name" placeholder="Digite seu nome completo" required>
+                </div>
+            </div>
+
+            <!-- Proteínas -->
+            <div class="card cat-proteina">
+                <h2>🥩 Proteína (Escolha 1)</h2>
+                <div class="option-group">
+                    <label class="option-item"><input type="radio" name="proteina" value="Costela com aipim"> <span>Costela com aipim</span></label>
+                    <label class="option-item"><input type="radio" name="proteina" value="Frango cozido com batata"> <span>Frango cozido com batata</span></label>
+                    <label class="option-item"><input type="radio" name="proteina" value="Carne de porco frito"> <span>Carne de porco frito</span></label>
+                    <label class="option-item"><input type="radio" name="proteina" value="Peito de frango empanado"> <span>Peito de frango empanado</span></label>
+                    <label class="option-item"><input type="radio" name="proteina" value="Feijoada"> <span>Feijoada</span></label>
+                    <label class="option-item"><input type="radio" name="proteina" value="Uma opção de carne"> <span>Uma opção de carne</span></label>
+                </div>
+            </div>
+
+            <!-- Acompanhamentos -->
+            <div class="card cat-acomp">
+                <h2>🍝 Acompanhamentos</h2>
+                <div class="option-group">
+                    <label class="option-item"><input type="checkbox" name="acomp" value="Arroz"> <span>Arroz</span></label>
+                    <label class="option-item"><input type="checkbox" name="acomp" value="Macarrão"> <span>Macarrão</span></label>
+                </div>
+            </div>
+
+            <!-- Feijões e Legumes -->
+            <div class="card cat-feijao">
+                <h2>🍲 Feijões e Legumes</h2>
+                <div class="option-group">
+                    <label class="option-item"><input type="checkbox" name="feijao" value="Feijão tropeiro"> <span>Feijão tropeiro</span></label>
+                    <label class="option-item"><input type="checkbox" name="feijao" value="Feijão caldo"> <span>Feijão caldo</span></label>
+                    <label class="option-item"><input type="checkbox" name="feijao" value="Legumes cozido"> <span>Legumes cozido</span></label>
+                    <label class="option-item"><input type="checkbox" name="feijao" value="Beterraba"> <span>Beterraba</span></label>
+                </div>
+            </div>
+
+            <!-- Saladas e Frios -->
+            <div class="card cat-salada">
+                <h2>🥗 Saladas e Frios</h2>
+                <div class="option-group">
+                    <label class="option-item"><input type="checkbox" name="salada" value="Alface com tomate"> <span>Alface com tomate</span></label>
+                    <label class="option-item"><input type="checkbox" name="salada" value="Maionese"> <span>Maionese</span></label>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button type="button" id="btn-generate" class="btn-primary">
+                    ✨ Gerar Pedido
+                </button>
+                <div id="summary-box"></div>
+                <button type="button" id="btn-whatsapp" class="btn-whatsapp">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.319 1.592 5.448 0 9.886-4.438 9.889-9.886.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.735-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                    Enviar no WhatsApp
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // Configuração do Restaurante
+        const RESTAURANT_PHONE = "5511999999999"; // Substitua pelo número real (DDI + DDD + Número)
+
+        const form = document.getElementById('lunch-form');
+        const btnGenerate = document.getElementById('btn-generate');
+        const btnWhatsapp = document.getElementById('btn-whatsapp');
+        const summaryBox = document.getElementById('summary-box');
+        const toast = document.getElementById('toast');
+
+        function showToast(message) {
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        function getSelectedValues(name) {
+            const elements = document.querySelectorAll(`input[name="${name}"]:checked`);
+            return Array.from(elements).map(el => el.value);
+        }
+
+        btnGenerate.addEventListener('click', () => {
+            const name = document.getElementById('user-name').value.trim();
+            const proteina = document.querySelector('input[name="proteina"]:checked');
+            
+            // Validações
+            if (!name) {
+                showToast("⚠️ Por favor, digite seu nome.");
+                document.getElementById('user-name').focus();
+                return;
+            }
+            if (!proteina) {
+                showToast("⚠️ Selecione uma proteína.");
+                return;
+            }
+
+            const acomp = getSelectedValues('acomp');
+            const feijao = getSelectedValues('feijao');
+            const salada = getSelectedValues('salada');
+
+            // Formatação do Resumo
+            let summary = `*PEDIDO DE ALMOÇO*\n`;
+            summary += `👤 *Nome:* ${name}\n`;
+            summary += `🥩 *Proteína:* ${proteina.value}\n`;
+            
+            if (acomp.length > 0) summary += `🍝 *Acomp:* ${acomp.join(', ')}\n`;
+            if (feijao.length > 0) summary += `🍲 *Feijão/Legumes:* ${feijao.join(', ')}\n`;
+            if (salada.length > 0) summary += `🥗 *Salada/Frios:* ${salada.join(', ')}`;
+
+            // Exibir Resumo
+            summaryBox.textContent = summary;
+            summaryBox.style.display = 'block';
+            
+            // Copiar para Clipboard
+            navigator.clipboard.writeText(summary).then(() => {
+                showToast("✅ Pedido copiado para a área de transferência!");
+            }).catch(err => {
+                console.error('Erro ao copiar: ', err);
+            });
+
+            // Mostrar botão WhatsApp
+            btnWhatsapp.style.display = 'flex';
+            
+            // Configurar link WhatsApp
+            const encodedText = encodeURIComponent(summary);
+            btnWhatsapp.onclick = () => {
+                window.open(`https://api.whatsapp.com/send?phone=${RESTAURANT_PHONE}&text=${encodedText}`, '_blank');
+            };
+        });
+    </script>
+</body>
+</html>
